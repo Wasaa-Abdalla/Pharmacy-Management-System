@@ -1,0 +1,91 @@
+import { createContext, useState, useEffect } from "react";
+import { api_url } from "../config.json";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const nav = useNavigate();
+
+  const [access_token, setAuthToken] = useState(() =>
+    localStorage.getItem("accessToken")
+  );
+  const [current_user, setCurrentUser] = useState(null);
+
+  // LOGIN
+const login = async (email, password) => {
+  try {
+    const res = await axios.post(`${api_url}/login`, { email, password });
+    if (res.data.access_token) {
+      localStorage.setItem("accessToken", res.data.access_token);
+      setAuthToken(res.data.access_token);
+      await getCurrentUser();
+      toast.success("Logged in successfully");
+      return true; // signal success
+    } else {
+      toast.error(res.data.error || "Something went wrong");
+      return false;
+    }
+  } catch (err) {
+    toast.error(err.response?.data?.error || "Login failed");
+    return false;
+  }
+};
+
+
+
+  // FETCH CURRENT USER
+const getCurrentUser = async () => {
+  try {
+    const res = await axios.get(`${api_url}/current_user`, {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+    // console.log("Fetched user:", res.data); // Debug
+    if (res.data && res.data.id) {
+      setCurrentUser(res.data); // includes roles
+    }
+  } catch (err) {
+    console.error("Failed to fetch current user", err);
+  }
+};
+
+
+  useEffect(() => {
+    if (access_token) {
+      getCurrentUser();
+    }
+  }, [access_token]);
+
+  // LOGOUT
+  const logout = async () => {
+    try {
+      await axios.delete(`${api_url}/logout`, {
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+    } catch (err) {
+      console.warn("Logout request failed, clearing session anyway");
+    } finally {
+      localStorage.removeItem("accessToken");
+      setAuthToken(null);
+      setCurrentUser(null);
+      nav("/login");
+      toast.success("Logged out successfully");
+    }
+  };
+
+  const context_data = {
+    login,
+    logout,
+    getCurrentUser,
+    current_user,
+    access_token,
+  };
+
+  return (
+    <AuthContext.Provider value={context_data}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
