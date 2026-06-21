@@ -51,20 +51,20 @@ def login_user():
         refresh_token = create_refresh_token(identity=str(user.id))
 
         # send login notification email
-        msg = Message(
-            subject="Login Notification",
-            recipients=[user.email],
-            body=f"""
-Hello {user.fname} {user.lname},
+#         msg = Message(
+#             subject="Login Notification",
+#             recipients=[user.email],
+#             body=f"""
+# Hello {user.fname} {user.lname},
 
-You have just logged into the application using your email: {user.email}.
-If this was not you, please secure your account immediately.
+# You have just logged into the application using your email: {user.email}.
+# If this was not you, please secure your account immediately.
 
-Best regards,
-Your Application Team
-"""
-        )
-        mail.send(msg)
+# Best regards,
+# Your Application Team
+# """
+#         )
+#         mail.send(msg)
 
         # Return full user object with roles
         user_schema = UserSchema()
