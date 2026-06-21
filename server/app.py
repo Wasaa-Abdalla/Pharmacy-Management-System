@@ -20,7 +20,7 @@ def create_app():
     ma.init_app(app)
     jwt.init_app(app)
     mail.init_app(app)
-    CORS(app)
+    CORS(app, origins=["https://pms-client-stun.onrender.com"])
     migrate.init_app(app, db)
 
 
