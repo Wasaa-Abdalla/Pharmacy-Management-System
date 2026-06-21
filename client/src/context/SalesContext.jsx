@@ -1,10 +1,10 @@
 import { createContext, useState, useRef , useEffect } from "react";
 import axios from "axios";
-import { api_url } from "../config.json";
 
 export const SalesContext = createContext();
 
 export function SalesProvider({ children }) {
+  const api_url = import.meta.env.VITE_API_URL;
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

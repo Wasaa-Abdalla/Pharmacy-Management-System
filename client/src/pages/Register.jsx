@@ -1,10 +1,10 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { api_url } from "../config.json";
 import { useNavigate } from "react-router-dom";
 
 function Register() {
+  const api_url = import.meta.env.VITE_API_URL;
   const nav = useNavigate();
   const [formData, setFormData] = useState({
     username: "",

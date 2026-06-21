@@ -6,7 +6,7 @@ import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 
 export default function ProfitLossReport() {
-  const api_url = config.api_url;
+  const api_url = import.meta.env.VITE_API_URL;
   const [profitLoss, setProfitLoss] = useState([]);
 
   useEffect(() => {

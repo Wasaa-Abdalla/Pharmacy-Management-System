@@ -27,7 +27,7 @@ ChartJS.register(
 );
 
 export default function Dashboard() {
-  const api_url = config.api_url;
+  const api_url = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
   // State for KPIs

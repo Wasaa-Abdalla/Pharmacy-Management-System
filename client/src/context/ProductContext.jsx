@@ -1,5 +1,4 @@
 import { createContext, useState, useEffect } from "react";
-import { api_url } from "../config.json";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
+  const api_url = import.meta.env.VITE_API_URL;
   const [products, setProducts] = useState([]);
   const [units, setUnits] = useState([]);
   const [categories, setCategories] = useState([]);

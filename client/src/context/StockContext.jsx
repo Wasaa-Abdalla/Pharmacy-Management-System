@@ -1,11 +1,11 @@
 import { createContext, useState } from "react";
-import { api_url } from "../config.json";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 
 export const StockContext = createContext();
 
 export const StockProvider = ({ children }) => {
+  const api_url = import.meta.env.VITE_API_URL;
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(false);
 

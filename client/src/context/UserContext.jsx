@@ -1,5 +1,4 @@
 import { createContext, useState } from "react";
-import { api_url } from "../config.json";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+  const api_url = import.meta.env.VITE_API_URL;
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
