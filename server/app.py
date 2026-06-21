@@ -4,19 +4,14 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from config import Config
 from views import *
-from extensions import db, ma, jwt, mail, migrate   # import extensions here
+from extensions import db, ma, jwt, mail, migrate
 from models import Role, User, UserRoles, ProductCategory, BaseUnit, Product, ProductStock, Sale, ProductSale
 
 # Load environment variables from .env
 load_dotenv()
 
 def create_app():
-    # Point Flask to your React build folder
-    app = Flask(
-        __name__,
-        static_folder="../client/dist",   # adjust path to your React build
-        template_folder="../client/dist"
-    )
+    app = Flask(__name__)
     app.config.from_object(Config)
 
     # Init extensions
@@ -25,6 +20,7 @@ def create_app():
     jwt.init_app(app)
     mail.init_app(app)
 
+    # ✅ Allow frontend domain + localhost dev
     CORS(app, origins=[
         "http://127.0.0.1:5173",
         "http://localhost:5173",
@@ -33,14 +29,8 @@ def create_app():
 
     migrate.init_app(app, db)
 
-    # Catch‑all route for React Router
-    @app.route("/", defaults={"path": ""})
-    @app.route("/<path:path>")
-    def catch_all(path):
-        return app.send_static_file("index.html")
-
-    # Register blueprints
-    app.register_blueprint(auth_bp, url_prefix="/")   # ensure login route is exposed
+    # ✅ Register blueprints directly under "/"
+    app.register_blueprint(auth_bp, url_prefix="/")
     app.register_blueprint(user_bp, url_prefix="/")
     app.register_blueprint(role_bp, url_prefix="/")
     app.register_blueprint(user_type_bp, url_prefix="/")
@@ -57,7 +47,6 @@ def create_app():
         return jsonify({"status": "ok"}), 200
 
     return app
-
 
 if __name__ == "__main__":
     app = create_app()
