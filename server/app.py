@@ -40,17 +40,17 @@ def create_app():
         return app.send_static_file("index.html")
 
     # Register blueprints
-    app.register_blueprint(auth_bp, url_prefix="/api")
-    app.register_blueprint(user_bp, url_prefix="/api")
-    app.register_blueprint(role_bp, url_prefix="/api")
-    app.register_blueprint(user_type_bp, url_prefix="/api")
-    app.register_blueprint(base_unit_bp, url_prefix="/api")
-    app.register_blueprint(product_bp, url_prefix="/api")
-    app.register_blueprint(product_category_bp, url_prefix="/api")
-    app.register_blueprint(product_stock_bp, url_prefix="/api")
-    app.register_blueprint(product_sale_bp, url_prefix="/api")
-    app.register_blueprint(sale_bp, url_prefix="/api")
-    app.register_blueprint(reports_bp, url_prefix="/api")
+    app.register_blueprint(auth_bp, url_prefix="/")   # ensure login route is exposed
+    app.register_blueprint(user_bp, url_prefix="/")
+    app.register_blueprint(role_bp, url_prefix="/")
+    app.register_blueprint(user_type_bp, url_prefix="/")
+    app.register_blueprint(base_unit_bp, url_prefix="/")
+    app.register_blueprint(product_bp, url_prefix="/")
+    app.register_blueprint(product_category_bp, url_prefix="/")
+    app.register_blueprint(product_stock_bp, url_prefix="/")
+    app.register_blueprint(product_sale_bp, url_prefix="/")
+    app.register_blueprint(sale_bp, url_prefix="/")
+    app.register_blueprint(reports_bp, url_prefix="/")
 
     @app.route("/health", methods=["GET"])
     def health_check():
