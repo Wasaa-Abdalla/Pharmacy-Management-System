@@ -22,8 +22,8 @@ def roles_required(*required_roles):
         def decorated_function(*args, **kwargs):
             user_id = get_jwt_identity()
             try:
-                user_uuid = uuid.UUID(user_id)  # convert string to UUID
-            except ValueError:
+                user_uuid = uuid.UUID(user_id)
+            except (ValueError, TypeError):
                 return jsonify({"error": "Invalid token identity"}), 422
 
             user = User.query.get(user_uuid)
@@ -37,6 +37,7 @@ def roles_required(*required_roles):
             return fn(*args, **kwargs)
         return decorated_function
     return wrapper
+
 
 # ==================== AUTH =============================
 
@@ -98,7 +99,7 @@ def current_user():
     user_id = get_jwt_identity()
     try:
         user_uuid = uuid.UUID(user_id)  # convert string to UUID
-    except ValueError:
+    except (ValueError, TypeError):
         return jsonify({"error": "Invalid token identity"}), 422
 
     user = User.query.get(user_uuid)
@@ -107,6 +108,7 @@ def current_user():
 
     user_schema = UserSchema()
     return jsonify(user_schema.dump(user)), 200
+
 
 
 # LOGOUT
