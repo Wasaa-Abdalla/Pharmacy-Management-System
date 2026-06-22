@@ -21,7 +21,12 @@ def roles_required(*required_roles):
         @jwt_required()
         def decorated_function(*args, **kwargs):
             user_id = get_jwt_identity()
-            user = User.query.get(user_id)  # identity is already a string UUID
+            try:
+                user_uuid = uuid.UUID(user_id)  # convert string to UUID
+            except ValueError:
+                return jsonify({"error": "Invalid token identity"}), 422
+
+            user = User.query.get(user_uuid)
             if not user:
                 return jsonify({"error": "User not found"}), 404
 
@@ -91,8 +96,12 @@ def refresh():
 @jwt_required()
 def current_user():
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)  # identity is already a string UUID
+    try:
+        user_uuid = uuid.UUID(user_id)  # convert string to UUID
+    except ValueError:
+        return jsonify({"error": "Invalid token identity"}), 422
 
+    user = User.query.get(user_uuid)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
