@@ -15,7 +15,7 @@ def seed_user_types():
     db.session.commit()
 
 def seed_roles():
-    roles = ["Manage Users", "Manage Stock", "Dispense Product", "View Reports"]
+    roles = ["Manage Users", "Manage Stock","Manage Sales","Manage Settings", "Dispense Product", "View Reports"]
     for r in roles:
         if not Role.query.filter_by(name=r).first():
             db.session.add(Role(id=uuid.uuid4(), name=r))

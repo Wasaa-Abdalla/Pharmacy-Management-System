@@ -14,56 +14,63 @@ export const AuthProvider = ({ children }) => {
   );
   const [current_user, setCurrentUser] = useState(null);
 
+  // ✅ Axios interceptor: always attach token
+  axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
   // LOGIN
-const login = async (email, password) => {
-  try {
-    const res = await axios.post(`${api_url}/login`, { email, password });
-    if (res.data.access_token) {
-      localStorage.setItem("accessToken", res.data.access_token);
-      setAuthToken(res.data.access_token);
-      await getCurrentUser();
-      toast.success("Logged in successfully");
-      return true; // signal success
-    } else {
-      toast.error(res.data.error || "Something went wrong");
+  const login = async (email, password) => {
+    try {
+      const res = await axios.post(`${api_url}/login`, { email, password });
+      if (res.data.access_token) {
+        localStorage.setItem("accessToken", res.data.access_token);
+        setAuthToken(res.data.access_token);
+
+        // ✅ Pass token explicitly to avoid race condition
+        await getCurrentUser(res.data.access_token);
+
+        toast.success("Logged in successfully");
+        return true;
+      } else {
+        toast.error(res.data.error || "Something went wrong");
+        return false;
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Login failed");
       return false;
     }
-  } catch (err) {
-    toast.error(err.response?.data?.error || "Login failed");
-    return false;
-  }
-};
-
-
+  };
 
   // FETCH CURRENT USER
-const getCurrentUser = async () => {
-  try {
-    const res = await axios.get(`${api_url}/current_user`, {
-      headers: { Authorization: `Bearer ${access_token}` },
-    });
-    // console.log("Fetched user:", res.data); // Debug
-    if (res.data && res.data.id) {
-      setCurrentUser(res.data); // includes roles
+  const getCurrentUser = async (token) => {
+    try {
+      const activeToken = token || localStorage.getItem("accessToken");
+      const res = await axios.get(`${api_url}/current_user`, {
+        headers: { Authorization: `Bearer ${activeToken}` },
+      });
+      if (res.data && res.data.id) {
+        setCurrentUser(res.data); // includes roles
+      }
+    } catch (err) {
+      console.error("Failed to fetch current user", err);
     }
-  } catch (err) {
-    console.error("Failed to fetch current user", err);
-  }
-};
-
+  };
 
   useEffect(() => {
     if (access_token) {
-      getCurrentUser();
+      getCurrentUser(access_token);
     }
   }, [access_token]);
 
   // LOGOUT
   const logout = async () => {
     try {
-      await axios.delete(`${api_url}/logout`, {
-        headers: { Authorization: `Bearer ${access_token}` },
-      });
+      await axios.delete(`${api_url}/logout`);
     } catch (err) {
       console.warn("Logout request failed, clearing session anyway");
     } finally {
