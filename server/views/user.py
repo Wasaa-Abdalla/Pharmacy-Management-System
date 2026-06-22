@@ -137,11 +137,11 @@ def fetch_user(id):
 
 
 # UPDATE USER
-@user_bp.route("/users/<uuid:id>", methods=["PUT"])
-def update_user(id):
-    user = User.query.get(id)
+@user_bp.route("/users/<uuid:user_id>", methods=["PUT"])
+def update_user(user_id):
+    user = User.query.get(user_id)
     if not user:
-        return jsonify({"error": "User does not exist"}), 404
+        return jsonify({"error": "User not found"}), 404
 
     data = request.get_json()
     user.username = data.get("username", user.username)
@@ -149,8 +149,16 @@ def update_user(id):
     user.lname = data.get("lname", user.lname)
     user.email = data.get("email", user.email)
 
+    # IMPORTANT: preserve roles unless explicitly changed
+    if "roles" in data:
+        user.roles.clear()
+        for role_name in data["roles"]:
+            role = Role.query.filter_by(name=role_name).first()
+            if role:
+                user.roles.append(role)
+
     db.session.commit()
-    return jsonify({"success": "User updated successfully"}), 200
+    return jsonify(UserSchema().dump(user)), 200
 
 
 # DELETE USER
